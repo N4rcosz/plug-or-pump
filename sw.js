@@ -1,7 +1,7 @@
 ﻿// Offline support for the home-screen app.
 // The page is fetched fresh when online (so a new version shows up) and served from the device when offline.
 // The map library from cdnjs is kept after its first use; map tiles and prices always need a connection.
-const CACHE = 'plug-or-pump-v1.6'; // change with every release so old files are dropped
+const CACHE = 'plug-or-pump-v1.6-icon2'; // change with every release so old files are dropped
 const SHELL = ['./', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', (e) => {
