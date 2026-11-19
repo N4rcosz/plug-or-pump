@@ -9,8 +9,8 @@
 <title>Plug Or Pump</title>
 <meta name="author" content="N4rcos">
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f4f3">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f0f">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#e6ecea">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090c0c">
 <!-- Home-screen app: these files sit next to index.html on the web host (see site/); inside Claude they are simply not found. -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -20,23 +20,32 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 /* Layout: instrument-cluster header with the savings figure, cost race chart, then entry form and a month-grouped logbook like the spreadsheet.
-   Look: the device's own system font, soft cards on a quiet background, press feedback on every control. */
+   Look: liquid glass (as in MusicCraft): frosted panels over soft teal and amber light, pill buttons, glass switches. */
 :root {
-  --bg: #f2f4f3;
-  --surface: #ffffff;
-  --ink: #121a19;
-  --muted: #5f6d6b;
-  --line: #e1e6e5;
+  --bg: #e6ecea;
+  --surface: rgba(255, 255, 255, .55);   /* glass */
+  --pop: #f7faf9;                        /* solid surface for menus and map popups */
+  --ink: rgba(16, 24, 23, .92);
+  --ink-contrast: #fff;                  /* text on --ink (primary buttons) */
+  --muted: rgba(16, 24, 23, .6);
+  --line: rgba(16, 24, 23, .12);
+  --hover: rgba(16, 24, 23, .06);
+  --press: rgba(16, 24, 23, .12);
+  --field: rgba(255, 255, 255, .6);
   --volt: #0a8574;        /* electricity */
-  --volt-soft: #dcf1ed;
+  --volt-soft: rgba(10, 133, 116, .14);
   --fuel: #b86e12;        /* petrol / Super */
-  --fuel-soft: #f7ead6;
+  --fuel-soft: rgba(184, 110, 18, .14);
   --good: #1d8248;
   --bad: #c0392b;
-  --focus: #0a66d8;
+  --focus: rgba(16, 24, 23, .92);
   --spark: #f2b705;       /* lightning bolt in the start animation */
-  --shadow: 0 1px 2px rgba(16, 24, 23, .05), 0 6px 20px rgba(16, 24, 23, .06);
-  --radius: 18px;
+  --blob1: #8fe0d2; --blob2: #f6c98e; --blob3: #b9c7f2;   /* backdrop light */
+  --veil: rgba(255, 255, 255, .25);
+  --glass-hi: rgba(255, 255, 255, .85);  /* bright top edge */
+  --shadow: inset 0 1px 0 var(--glass-hi), 0 10px 30px rgba(20, 40, 40, .10);
+  --radius: 22px;
+  --blur: 28px;
   --ease-out: cubic-bezier(.23, 1, .32, 1);
   --f-display: system-ui, -apple-system, "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
   --f-body: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
@@ -44,22 +53,36 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0b0f0f; --surface: #151b1b; --ink: #e8efed; --muted: #93a3a0; --line: #253030;
-    --volt: #3ccbb5; --volt-soft: #133631; --fuel: #f2a649; --fuel-soft: #3a2912;
-    --good: #4fc77f; --bad: #f0806b; --focus: #6aa8ff; --spark: #ffd84a; color-scheme: dark;
-    --shadow: 0 0 0 1px var(--line);
+    --bg: #090c0c; --surface: rgba(255, 255, 255, .07); --pop: #1b2222; --ink: rgba(255, 255, 255, .94); --ink-contrast: #111;
+    --muted: rgba(255, 255, 255, .62); --line: rgba(255, 255, 255, .14); --hover: rgba(255, 255, 255, .09); --press: rgba(255, 255, 255, .16); --field: rgba(255, 255, 255, .10);
+    --volt: #45d3bd; --volt-soft: rgba(69, 211, 189, .18); --fuel: #f5aa52; --fuel-soft: rgba(245, 170, 82, .18);
+    --good: #5fd38c; --bad: #ff7b6b; --focus: #fff; --spark: #ffd84a;
+    --blob1: #0f6a5d; --blob2: #7a4410; --blob3: #2e3480; --veil: rgba(8, 10, 10, .45);
+    --glass-hi: rgba(255, 255, 255, .22); --shadow: inset 0 1px 0 var(--glass-hi), 0 12px 32px rgba(0, 0, 0, .32); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0b0f0f; --surface: #151b1b; --ink: #e8efed; --muted: #93a3a0; --line: #253030;
-  --volt: #3ccbb5; --volt-soft: #133631; --fuel: #f2a649; --fuel-soft: #3a2912;
-  --good: #4fc77f; --bad: #f0806b; --focus: #6aa8ff; --spark: #ffd84a; color-scheme: dark;
-  --shadow: 0 0 0 1px var(--line);
+    --bg: #090c0c; --surface: rgba(255, 255, 255, .07); --pop: #1b2222; --ink: rgba(255, 255, 255, .94); --ink-contrast: #111;
+    --muted: rgba(255, 255, 255, .62); --line: rgba(255, 255, 255, .14); --hover: rgba(255, 255, 255, .09); --press: rgba(255, 255, 255, .16); --field: rgba(255, 255, 255, .10);
+    --volt: #45d3bd; --volt-soft: rgba(69, 211, 189, .18); --fuel: #f5aa52; --fuel-soft: rgba(245, 170, 82, .18);
+    --good: #5fd38c; --bad: #ff7b6b; --focus: #fff; --spark: #ffd84a;
+    --blob1: #0f6a5d; --blob2: #7a4410; --blob3: #2e3480; --veil: rgba(8, 10, 10, .45);
+    --glass-hi: rgba(255, 255, 255, .22); --shadow: inset 0 1px 0 var(--glass-hi), 0 12px 32px rgba(0, 0, 0, .32); color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; background: var(--field); }
+/* Backdrop: soft teal and amber light behind the glass, blurred like MusicCraft's album art. */
+body::before {
+  content: ""; position: fixed; inset: -12%; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(var(--veil), var(--veil)), /* dims the light so the glass text stays easy to read */
+    radial-gradient(38% 46% at 16% 16%, var(--blob1), transparent 70%),
+    radial-gradient(42% 50% at 88% 74%, var(--blob2), transparent 70%),
+    radial-gradient(30% 36% at 62% 36%, var(--blob3), transparent 70%);
+  filter: blur(70px) saturate(1.4);
+}
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45;
+  background: transparent; color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 24px 48px;
@@ -74,11 +97,12 @@ body {
 .wrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; padding: 3px 0; border-bottom: 1px solid var(--line); }
 .wrow:last-child { border-bottom: 0; }
 .wrow label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.wrow input { width: 16px; height: 16px; accent-color: var(--volt); }
 .wbtns { display: flex; align-items: center; gap: 4px; }
 .wmove { color: var(--muted); font-weight: 700; }
 .wmove:disabled { opacity: .3; cursor: default; }
 .wsize { min-width: 7rem; }
+@media (max-width: 520px) { .wrow .wbtns { flex-basis: 100%; padding-left: calc(2.9rem + 8px); } }
+:root[data-layout="phone"] .wrow .wbtns { flex-basis: 100%; padding-left: calc(2.9rem + 8px); }
 .wsize[aria-pressed="true"] { border-color: var(--volt); background: var(--volt-soft); }
 /* Tracking by size: big text tighter, small labels looser. */
 h1, h2, h3 { font-family: var(--f-display); font-weight: 700; margin: 0; text-wrap: balance; }
@@ -116,11 +140,10 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 .seg label { position: relative; cursor: pointer; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
 .seg span { display: block; padding: 6px 14px; border-radius: 9px; font-weight: 500; transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease; }
-.seg input:checked + span { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .14); }
+.seg input:checked + span { background: var(--press); color: var(--ink); font-weight: 600; box-shadow: inset 0 1px 0 var(--glass-hi); }
 .seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: -2px; }
 .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
 .checks label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 3px 0; }
-.checks input { width: 16px; height: 16px; accent-color: var(--volt); }
 .pref-note { font-size: .8rem; color: var(--muted); }
 .pref-toggle { display: flex; align-items: center; gap: 6px; width: 100%; padding: 4px 0; border: 0; background: none; color: inherit; cursor: pointer; text-align: left; }
 .pref-toggle svg { width: 14px; height: 14px; flex: none; color: var(--muted); transition: transform .2s ease; }
@@ -128,7 +151,7 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 .pref-body { display: grid; gap: 8px; }
 #prefs > .pref { border-top: 1px solid var(--line); padding-top: 10px; }
 /* Group headings: Display & layout, Cars, Prices, Data & backup */
-.pref-group { margin: 14px 0 0; padding-top: 12px; border-top: 2px solid var(--volt); font-size: 1.15rem; color: var(--ink); }
+.pref-group { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 1.15rem; color: var(--ink); }
 .panel-head + .pref-group { margin-top: 0; }
 .pref-group + .pref { border-top: 0; padding-top: 0; }
 @media (prefers-reduced-motion: reduce) { .pref-toggle svg { transition: none; } }
@@ -141,22 +164,22 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 
 /* car look pickers */
 .look-icon { display: inline-flex; width: 100%; height: 100%; padding: 2px; border: 1px solid transparent; border-radius: 8px; background: none; cursor: pointer; }
-.look-icon[aria-expanded="true"] { border-color: var(--line); background: var(--bg); }
+.look-icon[aria-expanded="true"] { border-color: var(--line); background: var(--field); }
 .look-icon svg { width: 100%; height: 100%; overflow: visible; }
 .carimg { display: block; width: 100%; height: 100%; object-fit: contain; }
 .carpic.drive img { animation: drive-in .9s cubic-bezier(.2, .7, .2, 1); }
 .look-colour { display: inline-flex; width: 30px; height: 30px; padding: 3px; flex: none; border-radius: 50%; border: 1px solid var(--line); cursor: pointer;
   background: conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
-.look-colour .chip { flex: 1; border-radius: 50%; border: 2px solid var(--surface); }
+.look-colour .chip { flex: 1; border-radius: 50%; border: 2px solid var(--pop); }
 .look-colour[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--volt); }
 /* Popovers open from their button (below it, left-aligned) and settle quickly. */
 .lookpop { position: fixed; z-index: 50; display: grid; gap: 10px; padding: 14px; max-width: calc(100vw - 16px);
-  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+  background: var(--pop); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; box-shadow: inset 0 1px 0 var(--glass-hi), 0 16px 40px rgba(0, 0, 0, .28);
   transform-origin: top left; transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }
 @starting-style { .lookpop { opacity: 0; transform: scale(.96); } }
 .pop-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 600; }
 .shape-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; width: min(330px, calc(100vw - 42px)); }
-.shape-opt { display: flex; height: 50px; padding: 6px 5px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; }
+.shape-opt { display: flex; height: 50px; padding: 6px 5px; border: 1px solid var(--line); border-radius: 10px; background: var(--field); cursor: pointer; }
 .shape-opt[aria-pressed="true"] { border-color: var(--volt); box-shadow: inset 0 0 0 1px var(--volt); background: var(--volt-soft); }
 .shape-opt svg { width: 100%; height: 100%; overflow: visible; }
 .wheel-disc { position: relative; justify-self: center; width: 180px; height: 180px; border-radius: 50%; cursor: crosshair; touch-action: none;
@@ -166,15 +189,17 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 .wheel-row { display: flex; align-items: center; gap: 10px; width: 220px; max-width: 100%; }
 .wheel-row input { flex: 1; min-width: 0; accent-color: var(--volt); }
 .wheel-now { width: 26px; height: 26px; flex: none; border-radius: 50%; border: 1px solid var(--line); }
-.ccrow .typesel { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); max-width: 100%; min-width: 0; }
+.ccrow .typesel { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); max-width: 100%; min-width: 0; }
 
 /* car selector */
 .carbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.carbar select { padding: 7px 12px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); font-family: var(--f-display); font-size: 1.15rem; font-weight: 650; letter-spacing: -.01em; max-width: 100%; min-width: 0; cursor: pointer; }
+#carSel { padding: 7px 14px; border-radius: 999px; background: var(--surface); box-shadow: var(--shadow); font-family: var(--f-display); font-size: 1.15rem; font-weight: 650; letter-spacing: -.01em; max-width: 100%; min-width: 0; cursor: pointer; }
 .carform { display: flex; flex-wrap: wrap; gap: 6px; }
-.carform input { padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; width: 14rem; max-width: 100%; }
-.carform input.cap { width: 8rem; font-family: var(--f-mono); }
-.carform select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+#carForm { flex-basis: 100%; display: grid; gap: 12px; padding: 18px 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%); backdrop-filter: blur(var(--blur)) saturate(180%); }
+#carForm .formlook { margin-right: auto; }
+.carform input { padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); min-width: 0; width: 14rem; max-width: 100%; }
+.carform select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); }
 .carpic { display: inline-flex; width: 112px; height: 42px; flex: none; }
 .carpic svg { width: 100%; height: 100%; overflow: visible; }
 .wheel { transform-box: fill-box; transform-origin: center; }
@@ -211,13 +236,18 @@ header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content:
 /* per-100 bars */
 .per100 { display: grid; gap: 10px; padding: 20px 24px; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); }
 .bar-row { display: grid; grid-template-columns: 70px minmax(0, 1fr) 92px; gap: 10px; align-items: center; }
-.bar-track { height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.bar-track { height: 12px; background: var(--field); border-radius: 6px; overflow: hidden; }
 .bar { height: 100%; border-radius: 6px; transition: width 500ms var(--ease-out); }
 .bar.v { background: var(--volt); } .bar.f { background: var(--fuel); }
 .bar-row .num { text-align: right; font-family: var(--f-mono); font-size: .88rem; }
 
 /* chart */
 .panel { background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 14px; min-width: 0; }
+/* Glass material: frosted surface over the backdrop, bright top edge where light catches it. */
+.panel, .cluster, .per100, #carSel {
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%); backdrop-filter: blur(var(--blur)) saturate(180%);
+}
 .panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
 .legend { display: flex; gap: 14px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; }
 .legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
@@ -241,21 +271,21 @@ form { display: grid; gap: 12px; }
   .field label { min-height: 2.6em; display: flex; align-items: flex-end; }
 }
 .field label { font-size: .78rem; color: var(--muted); font-weight: 500; }
-.field input { width: 100%; padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); font-family: var(--f-mono); font-size: .95rem;
+.field input { width: 100%; padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--field); font-family: var(--f-mono); font-size: .95rem;
   transition: border-color 140ms ease, box-shadow 140ms ease; }
 .field input:focus { border-color: var(--focus); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent); }
 .field .hint { font-size: .72rem; color: var(--muted); }
 .fieldset-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 600; grid-column: 1 / -1; margin-top: 4px; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.btn { border: 1px solid var(--line); background: var(--surface); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: 600;
+.btn { border: 1px solid transparent; background: var(--hover); padding: 8px 16px; border-radius: 999px; cursor: pointer; font-weight: 600;
   transition: transform 140ms var(--ease-out), background-color 140ms ease, border-color 140ms ease; }
-.btn.primary { background: var(--volt); color: var(--surface); border-color: var(--volt); }
-.btn.small { padding: 4px 10px; font-size: .8rem; font-weight: 550; border-radius: 9px; }
+.btn.primary { background: var(--ink); color: var(--ink-contrast); }
+.btn.small { padding: 5px 12px; font-size: .8rem; font-weight: 600; }
 /* Press feedback the moment a finger or click lands. */
 .btn:active, .icon-btn:active, .place-chip:active, .month-toggle:active, .shape-opt:active, .look-icon:active, .look-colour:active, .cmp-chips label:active { transform: scale(.97); }
 .btn:disabled { opacity: .5; cursor: default; transform: none; }
 .btn.danger { color: var(--bad); }
-.btn.danger.armed { background: var(--bad); color: var(--surface); border-color: var(--bad); }
+.btn.danger.armed { background: var(--bad); color: #fff; }
 .msg { font-size: .85rem; color: var(--muted); }
 .msg.err { color: var(--bad); }
 .preview { font-size: .85rem; color: var(--muted); font-family: var(--f-mono); }
@@ -278,15 +308,15 @@ table.log { min-width: 0; }
 .icon-btn.edit { color: var(--focus); }
 .icon-btn.del { color: var(--bad); }
 .icon-btn.del.armed { background: var(--bad); border-color: var(--bad); }
-.icon-btn.del.armed svg { stroke: var(--surface); }
+.icon-btn.del.armed svg { stroke: #fff; }
 @media (max-width: 1000px) { table.log:not(.custom) .opt { display: none; } }
 .lookpop .checks { width: min(320px, calc(100vw - 42px)); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 640px) { table.log { min-width: 600px; } }
 td.v { color: var(--volt); } td.f { color: var(--fuel); } td.s { color: var(--good); font-weight: 500; } td.s.neg { color: var(--bad); }
 td.dim { color: var(--muted); }
 tr.month td { font-family: var(--f-display); font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; text-align: left; border-bottom: 1px solid var(--line); padding-top: 18px; color: var(--ink); }
-tr.total td { font-weight: 600; background: var(--bg); border-bottom: 2px solid var(--line); }
-tr.total td.s { background: color-mix(in srgb, var(--good) 14%, var(--bg)); }
+tr.total td { font-weight: 600; background: var(--field); border-bottom: 2px solid var(--line); }
+tr.total td.s { background: color-mix(in srgb, var(--good) 16%, transparent); }
 tr.editing td { background: var(--volt-soft); }
 .soc { display: inline-flex; align-items: center; gap: 4px; }
 .soc .arrow { color: var(--volt); }
@@ -301,7 +331,7 @@ tr.editing td { background: var(--volt-soft); }
 
 /* warning in the entry form, credit line */
 div.warn { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border: 1px solid var(--fuel); border-radius: 10px;
-  background: color-mix(in srgb, var(--fuel) 14%, var(--surface)); color: var(--ink); font-size: .88rem; }
+  background: color-mix(in srgb, var(--fuel) 16%, transparent); color: var(--ink); font-size: .88rem; }
 .warn[hidden] { display: none; }
 .credit { text-align: center; font-size: .8rem; color: var(--muted); padding-block: 4px 8px; }
 .credit strong { color: var(--ink); font-weight: 600; }
@@ -309,9 +339,6 @@ td .calc-mark { color: var(--muted); }
 
 /* car type fields in the car form */
 .carform select { max-width: 100%; }
-.inline-lbl { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
-.carfixed { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex-basis: 100%; }
-.carfixed input { width: 9rem; font-family: var(--f-mono); }
 .hero .big.f { color: var(--fuel); }
 
 /* fuel logbook */
@@ -319,11 +346,13 @@ table.logf { min-width: 760px; }
 td.full-yes { color: var(--good); } td.full-no { color: var(--muted); }
 
 /* compare cars */
-.cmp-km { width: 6.5rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-family: var(--f-mono); text-align: right; }
+.cmp-km { width: 6.5rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); font-family: var(--f-mono); text-align: right; }
 .cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .cmp-chips label { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer; font-size: .85rem; }
 .cmp-chips label:has(input:checked) { border-color: var(--volt); background: var(--volt-soft); }
-.cmp-chips input { accent-color: var(--volt); }
+.cmp-chips input { position: absolute; opacity: 0; pointer-events: none; } /* the chip is the toggle */
+.cmp-chips label { position: relative; }
+.cmp-chips label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 .cmp-chips .chipcar { display: inline-flex; width: 46px; height: 18px; }
 .cmp-chips .chipcar svg { width: 100%; height: 100%; overflow: visible; }
 table.cmp { min-width: 0; }
@@ -338,7 +367,7 @@ table.cmp td.best { color: var(--good); }
 .cmp-bars { display: grid; gap: 8px; }
 .cmp-bar-row { display: grid; grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) 6.5rem; gap: 10px; align-items: center; font-size: .85rem; }
 .cmp-bar-row .num { text-align: right; font-family: var(--f-mono); }
-.cmp-track { display: flex; height: 14px; background: var(--bg); border-radius: 7px; overflow: hidden; }
+.cmp-track { display: flex; height: 14px; background: var(--field); border-radius: 7px; overflow: hidden; }
 .cmp-track span { height: 100%; }
 .seg-ev { background: var(--volt); } .seg-fuel { background: var(--fuel); } .seg-fix { background: var(--muted); opacity: .45; }
 .place-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -352,8 +381,8 @@ table.places td:first-child { color: var(--ink); font-weight: 600; }
 .finrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .finrow:last-child { border-bottom: 0; }
 .finrow .nm { font-weight: 600; flex: 1 1 9rem; min-width: 0; }
-.finrow input, .finrow select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); max-width: 100%; }
-.finrow input { width: 9.5rem; font-family: var(--f-mono); }
+.finrow .fin-mode { padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--field); max-width: 100%; }
+.finrow .fields { flex-basis: 100%; }
 .finrow .fin-res { flex-basis: 100%; }
 .seg-dep { background: repeating-linear-gradient(135deg, var(--muted) 0 3px, transparent 3px 6px); opacity: .7; }
 .warn-chip { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--fuel) 18%, transparent); color: var(--fuel); font: 600 .72rem var(--f-body); }
@@ -372,33 +401,32 @@ table.places td:first-child { color: var(--ink); font-weight: 600; }
 .map-controls .field { grid-row: auto; grid-template-rows: none; margin: 0; width: 13rem; max-width: 100%; }
 .map-controls .field:nth-child(2) { width: 7rem; }
 .map-check { display: flex; align-items: center; gap: 6px; padding-bottom: 8px; cursor: pointer; }
-.map-check input { accent-color: var(--volt); width: 16px; height: 16px; }
 .dot-leg { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; margin-right: 5px; }
-#map { position: relative; z-index: 0; height: 420px; max-height: 70vh; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+#map { position: relative; z-index: 0; height: 420px; max-height: 70vh; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
 #map.dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.82) contrast(.92); }
-#map .leaflet-popup-content-wrapper, #map .leaflet-popup-tip { background: var(--surface); color: var(--ink); }
+#map .leaflet-popup-content-wrapper, #map .leaflet-popup-tip { background: var(--pop); color: var(--ink); }
 #map .leaflet-popup-content { margin: 10px 12px; font: 13px/1.45 var(--f-body); display: grid; gap: 2px; }
 #map .leaflet-popup-content strong { font-family: var(--f-display); font-size: 1.05rem; }
 #map .pop-sub { color: var(--muted); }
 #map .pop-links { display: flex; gap: 12px; margin-top: 6px; }
 #map .pop-links a { color: var(--focus); font-weight: 600; }
-#map .leaflet-control-attribution { background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--muted); }
+#map .leaflet-control-attribution { background: color-mix(in srgb, var(--pop) 85%, transparent); color: var(--muted); }
 #map .leaflet-control-attribution a { color: var(--focus); }
 
 /* full cost table */
 table.costs { min-width: 520px; }
 table.costs td:first-child { font-family: var(--f-body); font-size: .9rem; }
-table.costs input { width: 7rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-family: var(--f-mono); font-size: .85rem; text-align: right; }
+table.costs input { width: 7rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); font-family: var(--f-mono); font-size: .85rem; text-align: right; }
 td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
 
 /* comparison settings */
 .settings .fields { grid-template-columns: 1fr 1fr; }
 .field.wide { grid-column: 1 / -1; }
-.regionsel { padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-weight: 600; max-width: 100%; min-width: 0; }
+.regionsel { padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); font-weight: 600; max-width: 100%; min-width: 0; }
 .regionprices, .autofields { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 .field .hint a { color: var(--focus); }
-.field select { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
-.calc { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 10px 12px; line-height: 1.6; }
+.field select { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); }
+.calc { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); background: var(--field); border-radius: 8px; padding: 10px 12px; line-height: 1.6; }
 .calc b { color: var(--ink); font-weight: 500; }
 
 @media (max-width: 860px) {
@@ -422,13 +450,13 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
 @media (prefers-reduced-motion: reduce) { .bar { transition: none; } .lookpop { transition: opacity 180ms ease; } }
 /* Hover only where there is a real pointer: on touch screens a tap would leave the hover stuck. */
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover { border-color: var(--muted); }
-  .btn.primary:hover { background: color-mix(in srgb, var(--volt) 88%, #fff); border-color: color-mix(in srgb, var(--volt) 88%, #fff); }
+  .btn:hover { background: var(--press); }
+  .btn.primary:hover { background: var(--ink); opacity: .88; }
   .pref-toggle:hover .label { color: var(--ink); }
-  .look-icon:hover { border-color: var(--line); background: var(--bg); }
+  .look-icon:hover { border-color: var(--line); background: var(--field); }
   .look-colour:hover { box-shadow: 0 0 0 2px var(--volt); }
   .shape-opt:hover { border-color: var(--muted); }
-  .month-toggle:hover { background: var(--bg); }
+  .month-toggle:hover { background: var(--field); }
   .icon-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
   .place-chip:hover { border-color: var(--volt); }
 }
@@ -453,6 +481,44 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
 :root[data-layout="phone"] .prefs-grid { grid-template-columns: minmax(0, 1fr); }
 :root[data-layout="phone"] table.log:not(.custom) .opt { display: none; }
 :root[data-layout="phone"] table.log { min-width: 600px; }
+
+/* Checkboxes are liquid-glass switches: a frosted track, a clear glass lens for a knob (it stretches
+   while pressed and settles with a small overshoot), and the electric colour glowing through when on. */
+input[type="checkbox"]:not(.cmp-chips input) {
+  --sw-w: 2.9rem; --sw-h: 1.6rem; --kn-w: 1.9rem; --stretch: 0rem;
+  -webkit-appearance: none; appearance: none; flex: none; position: relative; margin: 0; cursor: pointer;
+  width: var(--sw-w); height: var(--sw-h); border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+  -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, .28), inset 0 -1px 0 rgba(255, 255, 255, .16);
+  transition: background-color 260ms ease, box-shadow 260ms ease;
+}
+input[type="checkbox"]:not(.cmp-chips input)::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: calc(var(--kn-w) + var(--stretch)); height: calc(var(--sw-h) - 6px); border-radius: 999px;
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, .16) 60%, rgba(255, 255, 255, .34));
+  -webkit-backdrop-filter: blur(3px) saturate(1.35) brightness(1.05); backdrop-filter: blur(3px) saturate(1.35) brightness(1.05);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .95), inset 0 -2px 3px rgba(255, 255, 255, .3), inset 0 0 7px rgba(255, 255, 255, .3),
+    0 3px 8px rgba(0, 0, 0, .32), 0 0 0 .5px rgba(255, 255, 255, .4);
+  transition: transform 340ms cubic-bezier(.3, 1.4, .5, 1), width 180ms var(--ease-out);
+}
+input[type="checkbox"]:not(.cmp-chips input):checked {
+  background: color-mix(in srgb, var(--volt) 62%, transparent); border-color: color-mix(in srgb, var(--volt) 50%, transparent);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, .28), inset 0 -1px 0 rgba(255, 255, 255, .16), 0 0 8px color-mix(in srgb, var(--volt) 25%, transparent);
+}
+input[type="checkbox"]:not(.cmp-chips input):checked::after { transform: translateX(calc(var(--sw-w) - var(--kn-w) - 6px - var(--stretch))); }
+input[type="checkbox"]:not(.cmp-chips input):active { --stretch: .35rem; }
+input[type="checkbox"]:not(.cmp-chips input):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { input[type="checkbox"], input[type="checkbox"]::after { transition: none; } }
+/* Accessibility: frosted panels turn solid, edges get stronger. */
+@media (prefers-reduced-transparency: reduce) {
+  body::before { display: none; }
+  .panel, .cluster, .per100, #carSel, input[type="checkbox"], input[type="checkbox"]::after { background-color: var(--pop); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) { :root { --line: rgba(128, 128, 128, .7); } }
 
 /* Start animation: plug and nozzle cross like crossed bones, bolt and fuel shoot out, then "Plug / or / Pump". */
 .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--bg); cursor: pointer; transition: opacity .45s ease;
@@ -669,23 +735,25 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
     <button class="btn small" type="button" id="carAdd" data-i18n="addCar"></button>
     <button class="btn small" type="button" id="carRename" data-i18n="editCar"></button>
     <button class="btn small danger" type="button" id="carDelete"></button>
-    <form id="carForm" class="carform" hidden>
-      <input id="carName" maxlength="40" data-i18n-ph="carNamePh" data-i18n-aria="carNameAria" autocomplete="off">
-      <select id="carKind" data-i18n-aria="kindLbl"><option value="ev" data-i18n="kindEv"></option><option value="fuel" data-i18n="kindFuel"></option></select>
-      <select id="carConsSrc" data-i18n-aria="consSrcLbl"><option value="display" data-i18n="consSrcDisplay"></option><option value="calc" data-i18n="consSrcCalc"></option></select>
-      <select id="carFuelSel" data-i18n-aria="fuelType"></select>
-      <input id="carCap" class="cap" inputmode="decimal" data-i18n-ph="carCapPh" data-i18n-aria="carCapAria" autocomplete="off">
-      <label class="inline-lbl" id="carTwinWrap"><span data-i18n="twinLbl"></span><select id="carTwin"></select></label>
-      <span class="formlook" id="formLook"><span class="mini" id="formLookIcon"></span></span>
-      <span class="carfixed">
-        <span class="label" data-i18n="fixedPerYear"></span>
-        <input id="cfIns" inputmode="decimal" data-i18n-ph="cIns" data-i18n-aria="cIns" autocomplete="off">
-        <input id="cfTax" inputmode="decimal" data-i18n-ph="cTax" data-i18n-aria="cTax" autocomplete="off">
-        <input id="cfMaint" inputmode="decimal" data-i18n-ph="cMaint" data-i18n-aria="cMaint" autocomplete="off">
-        <input id="cfThg" inputmode="decimal" data-i18n-ph="cThg" data-i18n-aria="cThg" autocomplete="off">
-      </span>
-      <button class="btn small primary" type="submit" id="carSave"></button>
-      <button class="btn small" type="button" id="carCancel" data-i18n="cancel"></button>
+    <form id="carForm" hidden>
+      <div class="fields">
+        <div class="field wide"><label for="carName" data-i18n="carNameAria"></label><input id="carName" maxlength="40" data-i18n-ph="carNamePh" autocomplete="off"></div>
+        <div class="field"><label for="carKind" data-i18n="kindLbl"></label><select id="carKind"><option value="ev" data-i18n="kindEv"></option><option value="fuel" data-i18n="kindFuel"></option></select></div>
+        <div class="field"><label for="carFuelSel" data-i18n="fuelType"></label><select id="carFuelSel"></select></div>
+        <div class="field"><label for="carCap" data-i18n="carCapPh"></label><input id="carCap" inputmode="decimal" placeholder="77" data-i18n-aria="carCapAria" autocomplete="off"></div>
+        <div class="field wide"><label for="carConsSrc" data-i18n="consSrcLbl"></label><select id="carConsSrc"><option value="display" data-i18n="consSrcDisplay"></option><option value="calc" data-i18n="consSrcCalc"></option></select></div>
+        <div class="field wide"><label for="carTwin" data-i18n="twinLbl"></label><select id="carTwin"></select></div>
+        <span class="fieldset-title" data-i18n="fixedPerYear"></span>
+        <div class="field"><label for="cfIns" data-i18n="cIns"></label><input id="cfIns" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+        <div class="field"><label for="cfTax" data-i18n="cTax"></label><input id="cfTax" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+        <div class="field"><label for="cfMaint" data-i18n="cMaint"></label><input id="cfMaint" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+        <div class="field"><label for="cfThg" data-i18n="cThg"></label><input id="cfThg" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+      </div>
+      <div class="actions">
+        <span class="formlook" id="formLook"><span class="mini" id="formLookIcon"></span></span>
+        <button class="btn primary" type="submit" id="carSave"></button>
+        <button class="btn" type="button" id="carCancel" data-i18n="cancel"></button>
+      </div>
     </form>
     <span class="msg" id="carMsg"></span>
   </section>
@@ -924,7 +992,7 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
 
 <script>
 (function () {
-  const APP_VERSION = 'v1.6'; // bump for every saved version (file name: plug-or-pump vX.Y.html)
+  const APP_VERSION = 'v1.8'; // bump for every saved version (file name: plug-or-pump vX.Y.html)
   const $ = (id) => document.getElementById(id);
   // Today's date in local time (toISOString alone is UTC, which is yesterday just after midnight in Germany).
   const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
@@ -2507,7 +2575,7 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
   /* ---------- Settings → Purchase / leasing: one row per car ---------- */
   function readFinRow(row) {
     const lease = row.querySelector('.fin-mode').value === 'lease', fin = { mode: lease ? 'lease' : 'buy' };
-    row.querySelectorAll(lease ? '.fin-lease' : '.fin-buy').forEach((i) => { const v = parseNum(i.value); if (isNum(v)) fin[i.dataset.k] = v; });
+    row.querySelectorAll(lease ? '.fin-lease input' : '.fin-buy input').forEach((i) => { const v = parseNum(i.value); if (isNum(v)) fin[i.dataset.k] = v; });
     return fin;
   }
   function syncFinRow(row) {
@@ -2528,14 +2596,16 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
       for (const [v, k] of [['buy', 'finBuy'], ['lease', 'finLease']]) { const o = mk('option', null, t(k)); o.value = v; sel.append(o); }
       sel.value = f.mode === 'lease' ? 'lease' : 'buy';
       const inp = (key, ph, cls) => {
-        const i = mk('input', cls); i.inputMode = 'decimal'; i.autocomplete = 'off'; i.dataset.k = key;
-        i.placeholder = t(ph); i.title = t(ph); i.setAttribute('aria-label', carName(c) + ': ' + t(ph)); i.value = toField(f[key]);
-        return i;
+        const fld = mk('div', 'field ' + cls), lab = mk('label', null, t(ph)), i = mk('input');
+        i.id = 'fin_' + c.id + '_' + key; lab.htmlFor = i.id;
+        i.inputMode = 'decimal'; i.autocomplete = 'off'; i.dataset.k = key; i.value = toField(f[key]);
+        fld.append(lab, i);
+        return fld;
       };
-      row.append(mk('span', 'nm', carName(c)), sel,
-        inp('price', 'depPrice', 'fin-buy'), inp('resale', 'depResale', 'fin-buy'), inp('years', 'depYears', 'fin-buy'),
-        inp('rate', 'leaseRate', 'fin-lease'), inp('down', 'leaseDown', 'fin-lease'), inp('months', 'leaseMonths', 'fin-lease'),
-        mk('span', 'msg fin-res'));
+      const fields = mk('div', 'fields');
+      fields.append(inp('price', 'depPrice', 'fin-buy'), inp('resale', 'depResale', 'fin-buy'), inp('years', 'depYears', 'fin-buy'),
+        inp('rate', 'leaseRate', 'fin-lease'), inp('down', 'leaseDown', 'fin-lease'), inp('months', 'leaseMonths', 'fin-lease'));
+      row.append(mk('span', 'nm', carName(c)), sel, fields, mk('span', 'msg fin-res'));
       box.append(row); syncFinRow(row);
     }
   }
@@ -2600,10 +2670,8 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
   // Fuel cars pick a fuel; electric cars get a battery size and a fuel car to compare with.
   function syncCarFormKind() {
     const fuel = $('carKind').value === 'fuel';
-    $('carFuelSel').hidden = !fuel;
-    $('carCap').hidden = fuel;
-    $('carConsSrc').hidden = fuel;
-    $('cfThg').hidden = fuel;
+    const show = (id, on) => { $(id).closest('.field').hidden = !on; };
+    show('carFuelSel', fuel); show('carCap', !fuel); show('carConsSrc', !fuel); show('cfThg', !fuel);
   }
   $('carKind').addEventListener('change', () => { $('carTwin').value = ''; fillTwinOptions(carMode === 'rename' ? carObj() : null); syncCarFormKind(); });
   $('carSel').addEventListener('change', () => { currentCar = $('carSel').value; rememberCar(); carMsg(''); $('carForm').hidden = true; resetForm(); resetFuelForm(); render(); paintCarPic(true); });
@@ -3335,8 +3403,8 @@ td.pos { color: var(--good); } td.neg2 { color: var(--bad); }
     else if (hostTheme) rootEl.setAttribute('data-theme', hostTheme);
     else rootEl.removeAttribute('data-theme');
     // Phone status bar: the chosen theme's colour, or each system scheme's own.
-    const tc = { light: '#f2f4f3', dark: '#0b0f0f' }[ui.theme];
-    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = tc || (m.media.includes('dark') ? '#0b0f0f' : '#f2f4f3'); });
+    const tc = { light: '#e6ecea', dark: '#090c0c' }[ui.theme];
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = tc || (m.media.includes('dark') ? '#090c0c' : '#e6ecea'); });
   }
   function applyText() {
     rootEl.lang = ui.lang;
